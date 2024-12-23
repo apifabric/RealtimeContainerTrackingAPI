@@ -1,0 +1,120 @@
+{
+    "models": [
+        {
+            "classname": "Container",
+            "code": "class Container(Base):\n    \"\"\"description: Stores information about the containers being tracked.\"\"\"\n    __tablename__ = 'container'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    container_number = Column(String, nullable=False)\n    description = Column(String)\n    weight = Column(Integer)\n    origin = Column(String)\n    destination = Column(String)\n    shipment_date = Column(Date)\n    arrival_date = Column(Date, nullable=True)",
+            "sqlite_create": "CREATE TABLE container (\n    id INTEGER NOT NULL, \n    container_number VARCHAR NOT NULL, \n    description VARCHAR, \n    weight INTEGER, \n    origin VARCHAR, \n    destination VARCHAR, \n    shipment_date DATE, \n    arrival_date DATE, \n    PRIMARY KEY (id)\n)",
+            "description": "Stores information about the containers being tracked.",
+            "name": "Container"
+        },
+        {
+            "classname": "Location",
+            "code": "class Location(Base):\n    \"\"\"description: Represents locations where containers can be tracked.\"\"\"\n    __tablename__ = 'location'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String, nullable=False)\n    address = Column(String)\n    country = Column(String)\n    latitude = Column(Float)\n    longitude = Column(Float)",
+            "sqlite_create": "CREATE TABLE location (\n    id INTEGER NOT NULL, \n    name VARCHAR NOT NULL, \n    address VARCHAR, \n    country VARCHAR, \n    latitude FLOAT, \n    longitude FLOAT, \n    PRIMARY KEY (id)\n)",
+            "description": "Represents locations where containers can be tracked.",
+            "name": "Location"
+        },
+        {
+            "classname": "Shipment",
+            "code": "class Shipment(Base):\n    \"\"\"description: Represents a shipment event for a container.\"\"\"\n    __tablename__ = 'shipment'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    container_id = Column(Integer, ForeignKey('container.id'), nullable=False)\n    location_id = Column(Integer, ForeignKey('location.id'), nullable=False)\n    timestamp = Column(DateTime)\n    status = Column(String)",
+            "sqlite_create": "CREATE TABLE shipment (\n    id INTEGER NOT NULL, \n    container_id INTEGER NOT NULL, \n    location_id INTEGER NOT NULL, \n    timestamp DATETIME, \n    status VARCHAR, \n    PRIMARY KEY (id), \n    FOREIGN KEY(container_id) REFERENCES container (id), \n    FOREIGN KEY(location_id) REFERENCES location (id)\n)",
+            "description": "Represents a shipment event for a container.",
+            "name": "Shipment"
+        },
+        {
+            "classname": "Customer",
+            "code": "class Customer(Base):\n    \"\"\"description: Stores customer information.\"\"\"\n    __tablename__ = 'customer'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String, nullable=False)\n    email = Column(String)\n    phone_number = Column(String)",
+            "sqlite_create": "CREATE TABLE customer (\n    id INTEGER NOT NULL, \n    name VARCHAR NOT NULL, \n    email VARCHAR, \n    phone_number VARCHAR, \n    PRIMARY KEY (id)\n)",
+            "description": "Stores customer information.",
+            "name": "Customer"
+        },
+        {
+            "classname": "Order",
+            "code": "class Order(Base):\n    \"\"\"description: Stores order information related to a customer.\"\"\"\n    __tablename__ = 'order'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    customer_id = Column(Integer, ForeignKey('customer.id'), nullable=False)\n    order_date = Column(Date)\n    delivery_date = Column(Date, nullable=True)\n    status = Column(String)",
+            "sqlite_create": "CREATE TABLE order (\n    id INTEGER NOT NULL, \n    customer_id INTEGER NOT NULL, \n    order_date DATE, \n    delivery_date DATE, \n    status VARCHAR, \n    PRIMARY KEY (id), \n    FOREIGN KEY(customer_id) REFERENCES customer (id)\n)",
+            "description": "Stores order information related to a customer.",
+            "name": "Order"
+        },
+        {
+            "classname": "Product",
+            "code": "class Product(Base):\n    \"\"\"description: Information about products being shipped.\"\"\"\n    __tablename__ = 'product'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String, nullable=False)\n    description = Column(String)\n    weight = Column(Integer)\n    price = Column(Integer)",
+            "sqlite_create": "CREATE TABLE product (\n    id INTEGER NOT NULL, \n    name VARCHAR NOT NULL, \n    description VARCHAR, \n    weight INTEGER, \n    price INTEGER, \n    PRIMARY KEY (id)\n)",
+            "description": "Information about products being shipped.",
+            "name": "Product"
+        },
+        {
+            "classname": "OrderProduct",
+            "code": "class OrderProduct(Base):\n    \"\"\"description: Relationship between orders and products.\"\"\"\n    __tablename__ = 'order_product'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    order_id = Column(Integer, ForeignKey('order.id'), nullable=False)\n    product_id = Column(Integer, ForeignKey('product.id'), nullable=False)\n    quantity = Column(Integer)",
+            "sqlite_create": "CREATE TABLE order_product (\n    id INTEGER NOT NULL, \n    order_id INTEGER NOT NULL, \n    product_id INTEGER NOT NULL, \n    quantity INTEGER, \n    PRIMARY KEY (id), \n    FOREIGN KEY(order_id) REFERENCES order (id), \n    FOREIGN KEY(product_id) REFERENCES product (id)\n)",
+            "description": "Relationship between orders and products.",
+            "name": "OrderProduct"
+        },
+        {
+            "classname": "Route",
+            "code": "class Route(Base):\n    \"\"\"description: Stores information about the preferred container routes.\"\"\"\n    __tablename__ = 'route'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String, nullable=False)\n    description = Column(String)\n    start_location_id = Column(Integer, ForeignKey('location.id'), nullable=False)\n    end_location_id = Column(Integer, ForeignKey('location.id'), nullable=False)",
+            "sqlite_create": "CREATE TABLE route (\n    id INTEGER NOT NULL, \n    name VARCHAR NOT NULL, \n    description VARCHAR, \n    start_location_id INTEGER NOT NULL, \n    end_location_id INTEGER NOT NULL, \n    PRIMARY KEY (id), \n    FOREIGN KEY(start_location_id) REFERENCES location (id), \n    FOREIGN KEY(end_location_id) REFERENCES location (id)\n)",
+            "description": "Stores information about the preferred container routes.",
+            "name": "Route"
+        },
+        {
+            "classname": "Driver",
+            "code": "class Driver(Base):\n    \"\"\"description: Information about drivers handling the shipments.\"\"\"\n    __tablename__ = 'driver'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    name = Column(String, nullable=False)\n    license_number = Column(String)\n    phone_number = Column(String)",
+            "sqlite_create": "CREATE TABLE driver (\n    id INTEGER NOT NULL, \n    name VARCHAR NOT NULL, \n    license_number VARCHAR, \n    phone_number VARCHAR, \n    PRIMARY KEY (id)\n)",
+            "description": "Information about drivers handling the shipments.",
+            "name": "Driver"
+        },
+        {
+            "classname": "ContainerTracking",
+            "code": "class ContainerTracking(Base):\n    \"\"\"description: Tracks the current location and status of containers.\"\"\"\n    __tablename__ = 'container_tracking'\n    id = Column(Integer, primary_key=True, autoincrement=True)\n    container_id = Column(Integer, ForeignKey('container.id'), nullable=False)\n    current_location_id = Column(Integer, ForeignKey('location.id'), nullable=False)\n    driver_id = Column(Integer, ForeignKey('driver.id'))\n    status = Column(String)\n    last_update = Column(DateTime)",
+            "sqlite_create": "CREATE TABLE container_tracking (\n    id INTEGER NOT NULL, \n    container_id INTEGER NOT NULL, \n    current_location_id INTEGER NOT NULL, \n    driver_id INTEGER, \n    status VARCHAR, \n    last_update DATETIME, \n    PRIMARY KEY (id), \n    FOREIGN KEY(container_id) REFERENCES container (id), \n    FOREIGN KEY(current_location_id) REFERENCES location (id), \n    FOREIGN KEY(driver_id) REFERENCES driver (id)\n)",
+            "description": "Tracks the current location and status of containers.",
+            "name": "ContainerTracking"
+        }
+    ],
+    "rules": [],
+    "test_data": "# Test data rows of Container model\ncontainer1 = Container(container_number=\"CNT123\", description=\"Container 1\", weight=3000, origin=\"Port A\", destination=\"Port B\", shipment_date=date(2023, 10, 1), arrival_date=None)\ncontainer2 = Container(container_number=\"CNT456\", description=\"Container 2\", weight=3500, origin=\"Port C\", destination=\"Port D\", shipment_date=date(2023, 10, 5), arrival_date=None)\ncontainer3 = Container(container_number=\"CNT789\", description=\"Container 3\", weight=4000, origin=\"Port E\", destination=\"Port F\", shipment_date=date(2023, 10, 10), arrival_date=None)\ncontainer4 = Container(container_number=\"CNT101\", description=\"Container 4\", weight=5000, origin=\"Port G\", destination=\"Port H\", shipment_date=date(2023, 10, 12), arrival_date=None)\n\n# Test data rows of Location model\nlocation1 = Location(name=\"Warehouse A\", address=\"123 Main St, City A\", country=\"Country X\", latitude=47.6205, longitude=-122.3493)",
+    "test_data_rows": [
+        {
+            "test_data_row_variable": "container1",
+            "code": "container1 = Container(container_number=\"CNT123\", description=\"Container 1\", weight=3000, origin=\"Port A\", destination=\"Port B\", shipment_date=date(2023, 10, 1), arrival_date=None)"
+        },
+        {
+            "test_data_row_variable": "location1",
+            "code": "location1 = Location(name=\"Warehouse A\", address=\"123 Main St, City A\", country=\"Country X\", latitude=47.6205, longitude=-122.3493)"
+        },
+        {
+            "test_data_row_variable": "shipment1",
+            "code": "shipment1 = Shipment(container_id=1, location_id=1, timestamp=date(2023, 10, 1), status=\"In-transit\")"
+        },
+        {
+            "test_data_row_variable": "customer1",
+            "code": "customer1 = Customer(name=\"John Doe\", email=\"john@example.com\", phone_number=\"123-456-7890\")"
+        },
+        {
+            "test_data_row_variable": "order1",
+            "code": "order1 = Order(customer_id=1, order_date=date(2023, 10, 5), delivery_date=None, status=\"Pending\")"
+        },
+        {
+            "test_data_row_variable": "product1",
+            "code": "product1 = Product(name=\"Gadget\", description=\"High-tech gadget\", weight=200, price=99)"
+        },
+        {
+            "test_data_row_variable": "orderproduct1",
+            "code": "orderproduct1 = OrderProduct(order_id=1, product_id=1, quantity=10)"
+        },
+        {
+            "test_data_row_variable": "route1",
+            "code": "route1 = Route(name=\"Route A\", description=\"Fast route\", start_location_id=1, end_location_id=2)"
+        },
+        {
+            "test_data_row_variable": "driver1",
+            "code": "driver1 = Driver(name=\"Alice Smith\", license_number=\"D1234567\", phone_number=\"987-654-3210\")"
+        },
+        {
+            "test_data_row_variable": "containertracking1",
+            "code": "containertracking1 = ContainerTracking(container_id=1, current_location_id=1, driver_id=1, status=\"In-transit\", last_update=date(2023, 10, 1))"
+        }
+    ],
+    "test_data_sqlite": "INSERT INTO container (id, container_number, description, weight, origin, destination, shipment_date, arrival_date) VALUES (1, \"CNT123\", \"Container 1\", 3000, \"Port A\", \"Port B\", '2023-10-01', NULL);\nINSERT INTO location (id, name, address, country, latitude, longitude) VALUES (1, \"Warehouse A\", \"123 Main St, City A\", \"Country X\", 47.6205, -122.3493);\nINSERT INTO shipment (id, container_id, location_id, timestamp, status) VALUES (1, 1, 1, '2023-10-01', \"In-transit\");\nINSERT INTO customer (id, name, email, phone_number) VALUES (1, \"John Doe\", \"john@example.com\", \"123-456-7890\");\nINSERT INTO order (id, customer_id, order_date, delivery_date, status) VALUES (1, 1, '2023-10-05', NULL, \"Pending\");\nINSERT INTO product (id, name, description, weight, price) VALUES (1, \"Gadget\", \"High-tech gadget\", 200, 99);\nINSERT INTO order_product (id, order_id, product_id, quantity) VALUES (1, 1, 1, 10);\nINSERT INTO route (id, name, description, start_location_id, end_location_id) VALUES (1, \"Route A\", \"Fast route\", 1, 2);\nINSERT INTO driver (id, name, license_number, phone_number) VALUES (1, \"Alice Smith\", \"D1234567\", \"987-654-3210\");\nINSERT INTO container_tracking (id, container_id, current_location_id, driver_id, status, last_update) VALUES (1, 1, 1, 1, \"In-transit\", '2023-10-01');",
+    "name": "RealtimeContainerTrackingAPI"
+}
